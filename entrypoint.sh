@@ -1,31 +1,11 @@
 #!/bin/bash
-set -e
 
-if [[ "$1" == "slurmdbd" ]]; then
-  echo "Fixing permissions for slurmdbd.conf..."
-  chmod 600 /etc/slurm/slurmdbd.conf
-  chown slurm:slurm /etc/slurm/slurmdbd.conf
+mkdir -p /var/spool/slurmd
+mkdir -p /var/spool/slurm/state
+mkdir -p /var/log/slurm
 
-  echo "Starting slurmdbd..."
-  exec slurmdbd
+chown -R slurm:slurm /var/spool/slurmd /var/spool/slurm /var/log/slurm
 
-elif [[ "$1" == "slurmctld" ]]; then
-  echo "Preparing state directory for slurmctld..."
-  mkdir -p /var/spool/slurm/state
-  chown slurm:slurm /var/spool/slurm/state
+echo "Starting $1 on $(hostname -f)"
 
-  echo "Starting slurmctld..."
-  exec slurmctld
-
-elif [[ "$1" == "slurmd" ]]; then
-  echo "Preparing spool directory for slurmd..."
-  mkdir -p /var/spool/slurmd
-  chown -R slurm:slurm /var/spool/slurmd
-
-  echo "Starting slurmd..."
-  exec slurmd -Dvvv
-
-else
-  echo "Unknown command: $1"
-  exec "$@"
-fi
+exec "$@"

@@ -1,8 +1,9 @@
 services:
   mariadb:
+    container_name: mariadb
     image: mariadb:10.5
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: slurm_acct_db
       MYSQL_USER: slurm
       MYSQL_PASSWORD: slurmdbpass
@@ -12,45 +13,73 @@ services:
       - slurmnet
 
   slurmdbd:
+    container_name: slurmdbd
+    hostname: slurmdbd
     build:
       context: .
-    image: slurm-docker-slurmdbd
+      dockerfile: Dockerfile
+    volumes:
+      - ./conf:/etc/slurm
+      - slurmdbd_logs:/var/log
+      - slurmdbd_run:/var/run
+      - munge_key:/etc/munge
+    command: ["slurmdbd", "-Dvvv"]
     depends_on:
       - mariadb
-    volumes:
-      - ./slurmdbd.conf:/etc/slurm/slurmdbd.conf
-    command: slurmdbd
     networks:
       - slurmnet
 
   slurmctld:
+    container_name: slurmctld
+    hostname: slurmctld
     build:
       context: .
-    image: slurm-docker-slurmctld
+      dockerfile: Dockerfile
+    volumes:
+      - ./conf:/etc/slurm
+      - slurmctld_state:/var/spool/slurm
+      - slurmctld_logs:/var/log
+      - slurmctld_run:/var/run
+      - munge_key:/etc/munge
+    command: ["slurmctld", "-Dvvv"]
     depends_on:
       - slurmdbd
-    volumes:
-      - ./slurm.conf:/etc/slurm/slurm.conf
-    command: slurmctld
     networks:
       - slurmnet
 
   c1:
+    container_name: c1
     hostname: c1
-
     build:
       context: .
-    image: slurm-docker-c1
+      dockerfile: Dockerfile
+    volumes:
+      - ./conf:/etc/slurm
+      - c1_spool:/var/spool/slurmd
+      - c1_logs:/var/log
+      - c1_run:/var/run
+      - munge_key:/etc/munge
+    command: ["slurmd", "-Dvvv"]
     depends_on:
       - slurmctld
-    volumes:
-      - ./slurm.conf:/etc/slurm/slurm.conf
-    command: slurmd
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
     networks:
       - slurmnet
 
 volumes:
   mariadb:
+  slurmdbd_logs:
+  slurmdbd_run:
+  slurmctld_state:
+  slurmctld_logs:
+  slurmctld_run:
+  c1_spool:
+  c1_logs:
+  c1_run:
+  munge_key:
 
 networks:
   slurmnet:
