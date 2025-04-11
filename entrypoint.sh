@@ -23,7 +23,7 @@ elif [[ "$1" == "slurmd" ]]; then
   chown -R slurm:slurm /var/spool/slurmd
 
   echo "Starting slurmd..."
-  exec slurmd
+  exec slurmd -Dvvv
 
 else
   echo "Unknown command: $1"

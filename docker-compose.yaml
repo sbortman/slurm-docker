@@ -36,6 +36,8 @@ services:
       - slurmnet
 
   c1:
+    hostname: c1
+
     build:
       context: .
     image: slurm-docker-c1
