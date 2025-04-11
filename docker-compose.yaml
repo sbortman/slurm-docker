@@ -1,55 +1,55 @@
-# version: "3.9"
-
+version: "3.9"
 services:
   mariadb:
     image: mariadb:10.5
     environment:
-      MARIADB_ROOT_PASSWORD: root
-      MARIADB_DATABASE: slurm_acct_db
-      MARIADB_USER: slurm
-      MARIADB_PASSWORD: slurmdbpass
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: slurm_acct_db
+      MYSQL_USER: slurm
+      MYSQL_PASSWORD: slurmdbpass
+    volumes:
+      - mariadb:/var/lib/mysql
     networks:
       - slurmnet
 
   slurmdbd:
-    build: .
-    hostname: slurmdbd
-    environment:
-      - SLURMDBD=yes
+    build:
+      context: .
+    image: slurm-docker-slurmdbd
     depends_on:
       - mariadb
     volumes:
       - ./slurmdbd.conf:/etc/slurm/slurmdbd.conf
-    command: >
-      /bin/bash -c "chmod 600 /etc/slurm/slurmdbd.conf && /entrypoint.sh"
+    command: slurmdbd
     networks:
       - slurmnet
 
   slurmctld:
-    build: .
-    hostname: slurmctld
+    build:
+      context: .
+    image: slurm-docker-slurmctld
     depends_on:
       - slurmdbd
-    environment:
-      - SLURMCTLD=yes
     volumes:
       - ./slurm.conf:/etc/slurm/slurm.conf
-      - ./cgroup.conf:/etc/slurm/cgroup.conf
+    command: slurmctld
     networks:
       - slurmnet
 
   c1:
-    build: .
-    hostname: c1
+    build:
+      context: .
+    image: slurm-docker-c1
     depends_on:
       - slurmctld
-    environment:
-      - SLURMD=yes
     volumes:
       - ./slurm.conf:/etc/slurm/slurm.conf
-      - ./cgroup.conf:/etc/slurm/cgroup.conf
+    command: slurmd
     networks:
       - slurmnet
+
+volumes:
+  mariadb:
 
 networks:
   slurmnet:

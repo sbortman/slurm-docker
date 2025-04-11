@@ -5,7 +5,6 @@ RUN apt-get update && \
     id slurm || useradd -m slurm
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 RUN chmod 600 /etc/slurm/slurmdbd.conf && \
