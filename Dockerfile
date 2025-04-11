@@ -8,6 +8,8 @@ COPY entrypoint.sh /entrypoint.sh
 
 COPY slurmdbd.conf /etc/slurm/slurmdbd.conf
 RUN chmod 600 /etc/slurm/slurmdbd.conf && \
-    chown slurm:slurm /etc/slurm/slurmdbd.conf
+    chown slurm:slurm /etc/slurm/slurmdbd.conf && \
+    chmod +x /entrypoint.sh
+
 
 ENTRYPOINT ["/entrypoint.sh"]
