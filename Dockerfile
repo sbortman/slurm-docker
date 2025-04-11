@@ -12,6 +12,7 @@ RUN apt-get update && \
 
 # Copy entrypoint logic
 COPY entrypoint.sh /entrypoint.sh
+RUN chown slurm:slurm /etc/slurm/slurmdbd.conf
 RUN chmod +x /entrypoint.sh
 
 CMD ["/entrypoint.sh"]
