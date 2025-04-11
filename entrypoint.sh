@@ -12,7 +12,7 @@ if [[ "$1" == "slurmdbd" ]]; then
 elif [[ "$1" == "slurmctld" ]]; then
   echo "Preparing state directory for slurmctld..."
   mkdir -p /var/spool/slurm/state
-  chown -R slurm:slurm /var/spool/slurm
+  chown slurm:slurm /var/spool/slurm/state
 
   echo "Starting slurmctld..."
   exec slurmctld
