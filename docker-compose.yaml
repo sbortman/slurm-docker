@@ -66,6 +66,41 @@ services:
     entrypoint: ["/entrypoint.sh", "slurmd"]
     networks:
       - slurmnet
+  c2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: c2
+    hostname: c2
+    depends_on:
+      - slurmctld
+    volumes:
+      - ./conf/slurm.conf:/etc/slurm/slurm.conf:ro
+      - c2-run:/var/run/slurm
+      - c2-logs:/var/log/slurm
+      - c2-spool:/var/spool/slurmd
+      - slurm-munge-key:/etc/munge
+    entrypoint: ["/entrypoint.sh", "slurmd"]
+    networks:
+      - slurmnet
+  c3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: c3
+    hostname: c3
+    depends_on:
+      - slurmctld
+    volumes:
+      - ./conf/slurm.conf:/etc/slurm/slurm.conf:ro
+      - c3-run:/var/run/slurm
+      - c3-logs:/var/log/slurm
+      - c3-spool:/var/spool/slurmd
+      - slurm-munge-key:/etc/munge
+    entrypoint: ["/entrypoint.sh", "slurmd"]
+    networks:
+      - slurmnet
+
 
 volumes:
   mariadb:
@@ -77,6 +112,12 @@ volumes:
   c1-run:
   c1-logs:
   c1-spool:
+  c2-run:
+  c2-logs:
+  c2-spool:
+  c3-run:
+  c3-logs:
+  c3-spool:
   slurm-munge-key:
 
 networks:
